@@ -1,0 +1,78 @@
+CREATE TABLE Student(
+Id serial PRIMARY KEY NOT NULL,
+FirstName varchar(100) NOT NULL,
+LastName varchar(100) NOT NULL,
+DateOfBirth date NULL,
+EnrolledDate date NULL,
+Gender nchar(1),
+NationalIdNumber varchar(100) NULL,
+StudentCardNumber varchar(100) NULL
+)
+
+select * from student
+
+drop table student
+
+CREATE TABLE Teacher(
+Id serial PRIMARY KEY NOT NULL,
+FirstName varchar(20) NOT NULL,
+LastName varchar(30) NOT NULL,
+DateOfBirth date NOT NULL,
+AcademicRank varchar(20) NOT NULL,
+HireDate date NOT NULL
+)
+
+select * from Teacher
+
+drop table Teacher
+
+CREATE TABLE GradeDetails(
+Id serial PRIMARY KEY NOT NULL,
+GradeId Integer NOT NULL,
+AchievementTypeId Integer NOT NULL,
+AchievementPoints Integer NOT NULL,
+AchievementMaxPoints Integer NOT NULL,
+AchievementDate timestamp DEFAULT NOW()
+)
+
+select * from GradeDetails
+
+drop table GradeDetails
+
+CREATE TABLE Course(
+Id serial PRIMARY KEY NOT NULL,
+Name varchar(100) NOT NULL,
+Credit Integer NOT NULL,
+AcademicYear date NOT NULL,
+Semester varchar(20) NOT NULL
+)
+
+select * from Course
+
+drop table Course
+
+CREATE TABLE Grade(
+Id serial PRIMARY KEY NOT NULL,
+StudentId Integer NOT NULL,
+CourseId Integer NOT NULL,
+TeacherId Integer NOT NULL,
+Grade Integer NOT NULL,
+Comment varchar(100) NOT NULL,
+CreatedDate timestamp DEFAULT NOW()
+)
+
+select * from Grade
+
+drop table Grade
+
+CREATE TABLE AchievementType(
+Id serial PRIMARY KEY NOT NULL,
+Name varchar(100) NOT NULL,
+Description varchar(100) NOT NULL,
+ParticipationRate Integer NOT NULL
+)
+
+select * from AchievementType
+
+drop table AchievementType
+
