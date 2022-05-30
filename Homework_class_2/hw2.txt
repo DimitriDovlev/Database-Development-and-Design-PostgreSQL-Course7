@@ -1,0 +1,135 @@
+-- Homework requirement 1/6
+-- Find all Employees with  FirstName = Antonio
+SELECT *
+FROM Employee
+WHERE FirstName = 'Antonio'
+
+-- Find all Employees with DateOfBirth greater than ‘01.01.1979’
+
+SELECT *
+FROM Employee
+WHERE Employee.dateofbirth>'01.01.1979'
+
+--Find all Male Employees 
+
+SELECT *
+FROM Employee
+WHERE Employee.gender='M'
+
+-- Find all Employees with LastName starting With ‘T’
+
+SELECT *
+FROM Employee e
+WHERE e.lastname ilike 'T%'
+
+--Find all Employees hired in January/1988
+
+SELECT *
+FROM Employee e
+WHERE e.hiredate BETWEEN '01.01.1988' AND '01.31.1988'
+
+-- Find all Employees with LastName starting With ‘J’ hired in January/1988
+
+SELECT *
+FROM Employee e
+WHERE e.lastname  ilike 'J%'
+and e.hiredate BETWEEN '01.01.1988' AND '01.31.1988'
+
+-- Homework requirement 2/6
+-- Find all Employees with  FirstName = Antonio ordered by Last Name
+
+SELECT *
+FROM Employee e
+WHERE e.firstname ='Antonio'
+ORDER by e.lastname
+
+-- List all Employees ordered by FirstName
+
+SELECT *
+FROM Employee e
+ORDER BY e.firstname
+
+--Find all Male employees  ordered by HireDate, starting  from the last hired
+
+SELECT *
+FROM Employee e
+WHERE e.gender='M'
+ORDER BY e.hiredate desc
+
+-- Homework requirement 3/6
+-- List all Business  Entity region and Customer region names in single result  set WITH duplicates
+
+-- UNION returns without duplicates, UNION ALL returns with duplicates
+SELECT region
+FROM Businessentity
+UNION ALL
+SELECT regionname
+FROM Customer
+
+--List all Business  Entity region and Customer region names in single result  set WITHOUT duplicates
+
+SELECT region
+FROM Businessentity
+UNION
+SELECT regionname
+FROM Customer
+
+--List all common region names between  Business  Entities  and Customers
+
+--INTERSECT operator returns only distinct rows that are common to both sets
+
+SELECT region
+FROM Businessentity
+INTERSECT
+SELECT regionname
+FROM Customer
+
+-- Homework requirement 4/6
+-- Provide create table script for the Order table where it won’t allow an orderDate before 01.01.2010
+
+CREATE TABLE Order1(
+Id serial PRIMARY KEY NOT NULL,
+orderDate date check(orderDate>='01.01.2010')
+)
+
+-- Provide create table script for the Product  table where the price will always be AT LEAST 20% higher  than the cost
+
+CREATE TABLE Product1(
+Id serial PRIMARY KEY NOT NULL,
+Cost float(2),
+Price float(2) check (Price >= (Cost+(Cost*0.2)))
+)
+
+-- Provide create table script for the Product  table where all description values  will  be UNIQUE
+
+CREATE TABLE Product2(
+Id serial PRIMARY KEY NOT NULL,
+Description varchar(100) UNIQUE
+)
+
+-- Homework requirement 5/6
+-- Create Foreign  key constraints  for the Order table with  script
+
+CREATE TABLE orderForeignKey(
+Id serial PRIMARY KEY NOT NULL,
+Text varchar(10),
+Order1Id int references Order1(id)
+)
+
+-- Homework requirement 6/6
+-- List all possible  combinations  of Customer names and Product  names that can be ordered from a specific  customer 
+
+-- List all Business  Entities  that has any order
+
+-- List all Business  Entities  without  orders
+
+-- List all Customers without  orders  (using  Right  Join and using  Left join)
+
+
+
+
+
+
+
+
+
