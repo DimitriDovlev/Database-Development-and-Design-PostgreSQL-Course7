@@ -54,12 +54,37 @@ select s.firstname,s.lastname from student s
 -- Homework requirement 3/3
 -- Create new  view (vw_StudentGrades) that will  List all StudentIds and count of Grades  per student
 
+CREATE OR REPLACE VIEW vw_StudentGrades
+AS
+select s.id,g.grade from grade g inner join student s on (g.studentid=s.id)
+
+
 -- Change the view to show Student  First  and Last Names instead  of StudentID
+drop view vw_StudentGrades;
+
+CREATE OR REPLACE VIEW vw_StudentGrades
+AS
+select distinct(s.firstname|| ' ' || s.lastname) as name from grade g inner join student s on (g.studentid=s.id);
 
 -- List all rows from view ordered by biggest  Grade Count
 
+CREATE OR REPLACE VIEW vw_StudentGrades
+AS
+with temp as(
+select distinct(s.firstname|| ' ' || s.lastname) as name, g.grade from grade g inner join student s on (g.studentid=s.id)
+)
+select distinct(s.firstname|| ' ' || s.lastname) as name, g.grade from grade g inner join student s on (g.studentid=s.id);
+order by g.grade
+
 -- Create new  view (vw_StudentGradeDetails) that will List all Students (FirstName  and LastName) and Count the courses  he passed  through the exam
 
+CREATE OR REPLACE VIEW vw_StudentGradeDetails
+AS
+SELECT distinct(s.firstname|| ' ' || s.lastname) as Name, g.grade from grade g inner join student s on(g.studentid=s.id)
+where g.grade>1
+
+select * from student
+select * from grade
 
 
 
