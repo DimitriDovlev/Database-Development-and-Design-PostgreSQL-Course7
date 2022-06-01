@@ -1,0 +1,65 @@
+---------------------------------------------------------------------
+-- Homework requirement 1/3
+-- Calculate the count of all grades  in the  system
+select * from Grade;
+
+select count(*) from Grade
+
+--Calculate the count of all grades  per Teacher in the system
+select * from Teacher;
+
+select count(*) from Grade
+where not teacherid is null
+
+-- Calculate the count of all grades  per Teacher in the system for first 100 Students  (ID < 100)
+select * from Grade;
+
+select count(g.teacherid) from Grade g
+where g.id <= 100
+
+-- Find the  Maximal Grade,  and the Average Grade per Student  on all grades  in the system
+select * from Grade;
+
+select max(g.grade), avg(g.grade) from Grade g
+---------------------------------------------------------------------
+-- Homework requirement 2/3
+-- Calculate the count of all grades  per Teacher in the system and filter only grade count greater then  200
+select * from Grade;
+
+select count(g.teacherid) from Grade g
+where g.grade > 2
+
+-- Calculate the count of all grades  per Teacher in the system for first 100 Students  (ID < 100) and filter teachers  with  more than 50 Grade count
+
+select count(g.teacherid) from Grade g
+where g.id <=100 and g.grade>3
+
+-- Find the  Grade Count, Maximal Grade, and the Average Grade per Student  on all grades  in the system. Filter only records where Maximal Grade is equal to Average Grade
+
+select count(g.grade),max(g.grade),floor(avg(g.grade)) from grade g
+group by g.grade
+having (max(g.grade) = avg(g.grade))
+
+
+-- List Student  First  Name and Last Name next to the other details  from previous query
+
+with temp as(
+select count(g.grade),max(g.grade),floor(avg(g.grade)) from grade g
+group by g.grade
+having (max(g.grade) = avg(g.grade))
+)
+select s.firstname,s.lastname from student s
+
+
+-- Homework requirement 3/3
+-- Create new  view (vw_StudentGrades) that will  List all StudentIds and count of Grades  per student
+
+-- Change the view to show Student  First  and Last Names instead  of StudentID
+
+-- List all rows from view ordered by biggest  Grade Count
+
+-- Create new  view (vw_StudentGradeDetails) that will List all Students (FirstName  and LastName) and Count the courses  he passed  through the exam
+
+
+
+
