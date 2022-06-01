@@ -1,0 +1,151 @@
+-- Pre-requisites:  database from Homework 1 with  some dummy data inserted
+
+-- Delete previous data
+DROP TABLE IF EXISTS Student;
+DROP TABLE IF EXISTS Teacher;
+DROP TABLE IF EXISTS GradeDetails;
+DROP TABLE IF EXISTS Course;
+DROP TABLE IF EXISTS Grade;
+DROP TABLE IF EXISTS AchievementType;
+
+-- Create tables
+CREATE TABLE Student(
+Id serial PRIMARY KEY NOT NULL,
+FirstName varchar(100) NOT NULL,
+LastName varchar(100) NOT NULL,
+DateOfBirth date NULL,
+EnrolledDate date NULL,
+Gender nchar(1),
+NationalIdNumber varchar(100) NULL,
+StudentCardNumber varchar(100) NULL
+);
+
+CREATE TABLE Teacher(
+Id serial PRIMARY KEY NOT NULL,
+FirstName varchar(20) NOT NULL,
+LastName varchar(30) NOT NULL,
+DateOfBirth date NOT NULL,
+AcademicRank varchar(20) NOT NULL,
+HireDate date NOT NULL
+);
+
+CREATE TABLE GradeDetails(
+Id serial PRIMARY KEY NOT NULL,
+GradeId Integer NOT NULL,
+AchievementTypeId Integer,
+AchievementPoints Integer NOT NULL,
+AchievementMaxPoints Integer NOT NULL,
+AchievementDate timestamp DEFAULT NOW()
+);
+
+CREATE TABLE Course(
+Id serial PRIMARY KEY NOT NULL,
+Name varchar(100) NOT NULL,
+Credit Integer NOT NULL,
+AcademicYear varchar(20) NOT NULL,
+Semester varchar(20) NOT NULL
+);
+
+CREATE TABLE Grade(
+Id serial PRIMARY KEY NOT NULL,
+StudentId Integer NOT NULL,
+CourseId Integer NOT NULL,
+TeacherId Integer NOT NULL,
+Grade Integer NOT NULL,
+Comment varchar(100) NOT NULL,
+CreatedDate timestamp DEFAULT NOW()
+);
+
+CREATE TABLE AchievementType(
+Id serial PRIMARY KEY NOT NULL,
+Name varchar(100) NOT NULL,
+Description varchar(100) NOT NULL,
+ParticipationRate varchar(15) NOT NULL
+);
+-- Insert dummy data
+-- Student
+INSERT INTO Student (FirstName,LastName,DateOfBirth,EnrolledDate,Gender,NationalIdNumber,StudentCardNumber)
+VALUES ('Name1','lastName1','1970-01-10','2021-01-10','M',FLOOR (random() * (999999 - 100000)),FLOOR (random() * (999999 - 100000)));
+
+INSERT INTO Student (FirstName,LastName,DateOfBirth,EnrolledDate,Gender,NationalIdNumber,StudentCardNumber)
+VALUES ('Name2','lastName2','1980-01-10','2020-01-10','F',FLOOR (random() * (999999 - 100000)),FLOOR (random() * (999999 - 100000)));
+
+INSERT INTO Student (FirstName,LastName,DateOfBirth,EnrolledDate,Gender,NationalIdNumber,StudentCardNumber)
+VALUES ('Name3','lastName3','1990-01-10','2019-01-10','M',FLOOR (random() * (999999 - 100000)),FLOOR (random() * (999999 - 100000)));
+
+INSERT INTO Student (FirstName,LastName,DateOfBirth,EnrolledDate,Gender,NationalIdNumber,StudentCardNumber)
+VALUES ('Name4','lastName4','1990-01-10','2022-01-10','F',FLOOR (random() * (999999 - 100000)),FLOOR (random() * (999999 - 100000)));
+
+select * from student;
+-- Teacher
+INSERT INTO Teacher (FirstName,LastName,DateOfBirth,AcademicRank,HireDate)
+VALUES ('Name1','lastName1','1990-01-10','Instructor','2021-01-10');
+
+INSERT INTO Teacher (FirstName,LastName,DateOfBirth,AcademicRank,HireDate)
+VALUES ('Name2','lastName2','1980-01-10','Assistant Professor','2020-01-10');
+
+INSERT INTO Teacher (FirstName,LastName,DateOfBirth,AcademicRank,HireDate)
+VALUES ('Name3','lastName3','1970-01-10','Associate Professor','2019-01-10');
+
+INSERT INTO Teacher (FirstName,LastName,DateOfBirth,AcademicRank,HireDate)
+VALUES ('Name4','lastName4','1970-01-10','Professor','2018-01-10');
+
+select * from teacher;
+-- GradeDetails
+INSERT INTO GradeDetails (GradeId ,AchievementPoints ,AchievementMaxPoints  )
+VALUES (FLOOR (random() * (999 - 100)),FLOOR (random() * (999999 - 100000)),1000000);
+
+INSERT INTO GradeDetails (GradeId ,AchievementPoints ,AchievementMaxPoints  )
+VALUES (FLOOR (random() * (999 - 100)),FLOOR (random() * (999999 - 100000)),1000000);
+
+INSERT INTO GradeDetails (GradeId ,AchievementPoints ,AchievementMaxPoints  )
+VALUES (FLOOR (random() * (999 - 100)),FLOOR (random() * (999999 - 100000)),1000000);
+
+INSERT INTO GradeDetails (GradeId ,AchievementPoints ,AchievementMaxPoints  )
+VALUES (FLOOR (random() * (999 - 100)),FLOOR (random() * (999999 - 100000)),1000000);
+
+select * from GradeDetails;
+-- Course
+INSERT INTO Course (Name,Credit ,AcademicYear ,Semester)
+VALUES ('Course1',6,'2021/2022','Summer');
+
+INSERT INTO Course (Name,Credit ,AcademicYear ,Semester)
+VALUES ('Course2',6,'2022/2023','Winter');
+
+INSERT INTO Course (Name,Credit ,AcademicYear ,Semester)
+VALUES ('Course3',6,'2021/2022','Winter');
+
+INSERT INTO Course (Name,Credit ,AcademicYear ,Semester)
+VALUES ('Course4',6,'2022/2023','Summer');
+
+select * from Course;
+--Grade
+INSERT INTO Grade (StudentId,CourseId ,TeacherId ,Grade,Comment)
+VALUES (FLOOR (random() * (999 - 100)),FLOOR (random() * (999 - 100)),FLOOR (random() * (999 - 100)),FLOOR (random() * (9 - 1)),'comment');
+
+INSERT INTO Grade (StudentId,CourseId ,TeacherId ,Grade,Comment)
+VALUES (FLOOR (random() * (999 - 100)),FLOOR (random() * (999 - 100)),FLOOR (random() * (999 - 100)),FLOOR (random() * (9 - 1)),'comment');
+
+INSERT INTO Grade (StudentId,CourseId ,TeacherId ,Grade,Comment)
+VALUES (FLOOR (random() * (999 - 100)),FLOOR (random() * (999 - 100)),FLOOR (random() * (999 - 100)),FLOOR (random() * (9 - 1)),'comment');
+
+INSERT INTO Grade (StudentId,CourseId ,TeacherId ,Grade,Comment)
+VALUES (FLOOR (random() * (999 - 100)),FLOOR (random() * (999 - 100)),FLOOR (random() * (999 - 100)),FLOOR (random() * (9 - 1)),'comment');
+
+select * from grade;
+
+--AchievementType
+INSERT INTO AchievementType (Name,Description ,ParticipationRate)
+VALUES ('Achievement1','Description1','20%');
+
+INSERT INTO AchievementType (Name,Description ,ParticipationRate)
+VALUES ('Achievement2','Description2','40%');
+
+INSERT INTO AchievementType (Name,Description ,ParticipationRate)
+VALUES ('Achievement3','Description3','60%');
+
+INSERT INTO AchievementType (Name,Description ,ParticipationRate)
+VALUES ('Achievement4','Description4','80%');
+
+select * from AchievementType;
+
