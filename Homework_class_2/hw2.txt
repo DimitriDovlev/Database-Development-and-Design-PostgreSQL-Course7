@@ -119,12 +119,29 @@ Order1Id int references Order1(id)
 -- Homework requirement 6/6
 -- List all possible  combinations  of Customer names and Product  names that can be ordered from a specific  customer 
 
+select c.name ,p.name
+from customer c cross join product p
+
 -- List all Business  Entities  that has any order
+
+select * from businessentity b
+inner join "Order" o on (b.id=o.businessentityid)
 
 -- List all Business  Entities  without  orders
 
+select * from businessentity b
+left join "Order" o on (b.id=o.businessentityid)
+where o.businessentityid is null
+
 -- List all Customers without  orders  (using  Right  Join and using  Left join)
 
+select * from customer c
+left join "Order" o on (c.id=o.customerid)
+where o.customerid is null
+
+select c.* from "Order" o
+right join customer c on (c.id=o.customerid)
+where o.customerid is null
 
 
 
