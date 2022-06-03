@@ -9,79 +9,106 @@ select count(*) from Grade
 select * from Teacher;
 
 select count(*) from Grade
-where not teacherid is null
+group by (teacherid)
 
 -- Calculate the count of all grades  per Teacher in the system for first 100 Students  (ID < 100)
 select * from Grade;
 
 select count(g.teacherid) from Grade g
 where g.id <= 100
+group by g.teacherid
 
 -- Find the  Maximal Grade,  and the Average Grade per Student  on all grades  in the system
 select * from Grade;
 
-select max(g.grade), avg(g.grade) from Grade g
+select g.studentid,max(g.grade), avg(g.grade) from Grade g
+group by g.studentid
 ---------------------------------------------------------------------
 -- Homework requirement 2/3
 -- Calculate the count of all grades  per Teacher in the system and filter only grade count greater then  200
 select * from Grade;
+select * from Teacher;
 
-select count(g.teacherid) from Grade g
-where g.grade > 2
+select t.id,count(g.grade) from Grade g
+inner join teacher t on(t.id=g.teacherid)
+group by t.id ,g.grade > 2 
 
 -- Calculate the count of all grades  per Teacher in the system for first 100 Students  (ID < 100) and filter teachers  with  more than 50 Grade count
 
-select count(g.teacherid) from Grade g
-where g.id <=100 and g.grade>3
+select t.id as teacherID,sum(g.grade) as gradeCount from Grade g
+inner join teacher t on (t.id=g.teacherid)
+where g.studentid<=100 and g.grade>3
+group by t.id
 
 -- Find the  Grade Count, Maximal Grade, and the Average Grade per Student  on all grades  in the system. Filter only records where Maximal Grade is equal to Average Grade
+select * from Grade;
 
-select count(g.grade),max(g.grade),floor(avg(g.grade)) from grade g
-group by g.grade
-having (max(g.grade) = avg(g.grade))
+
+with temp as(
+select s.id,sum(g.grade) as GradeCount,max(g.grade) as MaxGrade,floor(avg(g.grade)) as AverageGrade from grade g
+inner join student s on(s.id=g.studentid)
+group by s.id
+) select * from temp
+where MaxGrade=AverageGrade
+
 
 
 -- List Student  First  Name and Last Name next to the other details  from previous query
 
 with temp as(
-select count(g.grade),max(g.grade),floor(avg(g.grade)) from grade g
-group by g.grade
-having (max(g.grade) = avg(g.grade))
-)
-select s.firstname,s.lastname from student s
-
+select s.id,s.firstname|| ' ' ||s.lastname as fullname,sum(g.grade) as GradeCount,max(g.grade) as MaxGrade,floor(avg(g.grade)) as AverageGrade from grade g
+inner join student s on(s.id=g.studentid)
+group by s.id
+) select * from temp
+where MaxGrade=AverageGrade
 
 -- Homework requirement 3/3
 -- Create new  view (vw_StudentGrades) that will  List all StudentIds and count of Grades  per student
 
 CREATE OR REPLACE VIEW vw_StudentGrades
 AS
-select s.id,g.grade from grade g inner join student s on (g.studentid=s.id)
+select s.id,sum(g.grade) from grade g 
+inner join student s on (g.studentid=s.id)
+group by s.id
 
+select * from vw_StudentGrades
 
 -- Change the view to show Student  First  and Last Names instead  of StudentID
 drop view vw_StudentGrades;
 
 CREATE OR REPLACE VIEW vw_StudentGrades
 AS
-select distinct(s.firstname|| ' ' || s.lastname) as name from grade g inner join student s on (g.studentid=s.id);
+select distinct(s.firstname|| ' ' || s.lastname) as fullname,sum(g.grade) from grade g 
+inner join student s on (g.studentid=s.id)
+GROUP BY fullname
 
 -- List all rows from view ordered by biggest  Grade Count
+drop view vw_StudentGrades;
+
+select * from vw_StudentGrades
+
 
 CREATE OR REPLACE VIEW vw_StudentGrades
 AS
 with temp as(
-select distinct(s.firstname|| ' ' || s.lastname) as name, g.grade from grade g inner join student s on (g.studentid=s.id)
+select distinct(s.firstname|| ' ' || s.lastname) as name, sum(g.grade) as gradecount from grade g 
+inner join student s on (g.studentid=s.id)
+group by s.firstname,s.lastname
+order by sum(g.grade) desc
 )
-select distinct(s.firstname|| ' ' || s.lastname) as name, g.grade from grade g inner join student s on (g.studentid=s.id);
-order by g.grade
+select * from temp
 
 -- Create new  view (vw_StudentGradeDetails) that will List all Students (FirstName  and LastName) and Count the courses  he passed  through the exam
+drop view vw_StudentGradeDetails;
+
+select * from vw_StudentGradeDetails
 
 CREATE OR REPLACE VIEW vw_StudentGradeDetails
 AS
-SELECT distinct(s.firstname|| ' ' || s.lastname) as Name, g.grade from grade g inner join student s on(g.studentid=s.id)
-where g.grade>1
+SELECT distinct(s.firstname|| ' ' || s.lastname) as Name, count(g.grade) from grade g
+inner join student s on(g.studentid=s.id)
+where g.grade>2
+group by s.id
 
 select * from student
 select * from grade
