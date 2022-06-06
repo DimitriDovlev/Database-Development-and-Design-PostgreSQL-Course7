@@ -1,0 +1,142 @@
+-- Homework requirement 1/3
+-- Calculate “(price + cost) / weight” for all products.
+select * from product
+
+select name,(price+cost)/weight as productCalculation from product
+
+-- Get a round  number  that is higher  or equal  for the costs and a round number  that is lower or equal for the prices  for all products.
+
+select name,cost,ceil(cost) as higherorequal,floor(cost) as lowerorequal from product
+
+-- Get all orders  and generate a random number  between  0 and 100 for every order.
+
+select o.*, Round(random() * 100) from public."Order" o
+
+-- Concatenate the name, region and zipcode from every business  entity and add the delimiter ‘; ‘ between them.
+select * from public.businessentity
+
+select concat(b.name,';',b.region,';',b.zipcode) from public.businessentity b
+
+select b.name||';'||b.region ||';'||b.zipcode as concat from public.businessentity b
+
+-- Declare temp table that will  contain LastName and HireDate columns. The HireDate column must not allow dates after 01.01.2010. Insert  5 rows of dummy data and display  every row inserted.
+
+create temporary table temp_table(
+id serial primary key not null,
+LastName varchar(20),
+HireDate date check (HireDate < '01.01.2010')
+)
+
+select * from temp_table
+
+insert into temp_table (LastName,HireDate)
+values
+('Name1','01.01.2009'),
+('Name2','01.01.2008'),
+('Name3','01.01.2007'),
+('Name4','01.01.2006'),
+('Name5','01.01.2005');
+
+-- new row for relation "temp_table" violates check constraint "temp_table_hiredate_check"
+insert into temp_table (LastName,HireDate)
+values
+('Name1','01.01.2011')
+----------------------------------------------------------------------------
+-- Homework requirement 2/3
+
+-- Create a function  (get_employees_hired_later_than)  that will  return 
+-- all employees  that were hired after a provided  date. Return  the 
+-- following  columns:
+--				The first and last name concatenated into one column with a space between them. The column should be named “Full name”.
+--				The age that the employee was at the time he was employed. Column should be named “Age of employee on hiring”.
+--				The national ID number concatenated with the gender, with a ‘; ‘ delimiter between them.
+
+DROP FUNCTION get_employees_hired_later_than(date)
+
+create or replace function get_employees_hired_later_than(Hire_Date date)
+	returns table(
+	Fullname text,
+	Ageofemployeeonhiring interval,
+	idandgender text	
+	)
+	language plpgsql
+as
+$$
+begin
+	return query
+	select concat(e.firstname,' ',e.lastname) as Fullname,
+	AGE(e.hiredate::date,e.dateofbirth::date) as Ageofemployeeonhiring,
+	concat(e.nationalidnumber,';',e.gender)
+	from public.employee e
+	where e.hiredate>=Hire_Date;
+end;
+$$;
+
+
+select get_employees_hired_later_than('01.01.2010')
+
+select * from get_employees_hired_later_than('01.01.2014')
+
+select *,(e.hiredate::date-e.dateofbirth::date),AGE(e.hiredate::date,e.dateofbirth::date),concat(e.nationalidnumber,';',e.gender) from public.employee e
+
+select e.* from public.employee e
+--------------------------------------------------------------------
+-- Homework requirement 3/3
+
+-- Create a function  (get_employee_orders)  that will  return all orders 
+-- done by a specific  employee.  Return  the following  columns:
+-- 1.			The first 3 letters of the name, the last 3 characters of the code and the full description concatenated delimited with the character ‘; ‘ 
+-- 1.			of the product for which the order was made.
+-- 2. 			The quantity of the order.
+-- 3. 			The business entity name for which the order was made.
+
+DROP FUNCTION get_employee_orders(integer)
+
+create or replace function get_employee_orders(employee_id integer)
+	returns table(
+	id integer,
+	productdetails text,
+	quantity real,
+	businessentityname date
+	)
+	language plpgsql
+as
+$$
+begin
+	return query
+	select
+	e.id,
+	concat(left(e.firstname,3),';',right(p.code,3),';',p.description),
+	o.totalprice,
+	o.orderdate
+	from public.employee e
+	left join public."Order" o on(o.employeeid=e.id)
+	left join public.product p on (p.price=o.totalprice)
+	where o.employeeid=employee_id
+	group by e.id,p.code,p.description,o.totalprice,o.orderdate;
+end;
+$$;
+
+
+select * from get_employee_orders(2)
+
+select e.* from public.employee e
+
+select o.* from public."Order" o
+
+select p.* from public.product p
+
+select b.* from public.businessentity b
+
+select
+	e.id,
+	concat(left(e.firstname,3),';',right(p.code,3),';',p.description),
+	o.totalprice,
+	o.orderdate
+	from public.employee e
+	inner join public."Order" o on(o.employeeid=e.id)
+	inner join public.product p on (p.price=o.totalprice)
+	--where o.employeeid=employee_id
+	group by e.id,p.code,p.description,o.totalprice,o.orderdate;
+
+
