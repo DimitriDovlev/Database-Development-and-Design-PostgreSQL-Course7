@@ -1,0 +1,129 @@
+-- 1. Create a function that returns all information from the products table for a given order ID, using a row variable.
+select * from public."Order"
+
+select * from public.product
+
+select * from public.orderdetails
+
+DROP FUNCTION product_information
+
+create or replace function product_information(order_id integer)
+	returns table(
+		id integer,
+		code varchar,
+		name varchar,
+		description varchar,
+		weight real,
+		price real,
+		cost real
+	)
+	language plpgsql
+as $$
+begin
+	return query
+	select p.* from public.orderdetails as od
+	inner join public.product as p on(od.productid=p.id)
+	where p.id=order_id;
+end; $$;
+
+select * from product_information (2)
+
+-- 2. Create a function doing the same thing from above but using a record.
+select * from public."Order"
+
+select * from public.product
+
+select * from public.orderdetails
+
+DROP FUNCTION product_information2
+
+create or replace function product_information2(order_id integer)
+	returns table(
+		id integer,
+		code varchar,
+		name varchar,
+		description varchar,
+		weight real,
+		price real,
+		cost real
+	)
+	language plpgsql
+as $$
+declare
+	order_details record;
+	
+begin
+	select od.* from public.orderdetails od into order_details
+	where od.id=order_id;
+
+	return query
+	select p.* from public.product as p
+	where p.id=order_details.orderid;
+end; $$;
+
+select * from product_information2(2)
+
+-- 3. Create a function that will return all customers that bought a certain product, determined by the product ID, with all of their information. 
+select * from public."Order"
+
+select * from public.product
+
+select * from public.customer
+
+select * from public.orderdetails
+
+DROP FUNCTION customer_details
+
+create or replace function customer_details(product_id integer)
+	returns table(
+		customerinformation text
+	)
+	language plpgsql
+as $$
+begin
+
+	return query
+	select (concat(c.id,' ',c.name,' ',c.accountnumber,' ',c.city,' ',c.regionname,' ',c.phonenumber,' ',c.isactive)) from public.orderdetails od
+	inner join public.product p on(p.id=od.productid)
+	inner join public."Order" o on(o.id=od.orderid)
+	inner join public.customer c on(c.id=o.customerid)
+	where od.productid=product_id;
+end;$$;
+
+select * from customer_details(2)
+
+
+-- 4. Create a function that returns the quantity for a given order ID, only if the quantity is bigger than 50. If it is not, raise a notice. Use the if/else statement.
+select * from public."Order"
+
+select * from public.product
+
+select * from public.orderdetails
+
+DROP FUNCTION order_quantity
+
+create or replace function order_quantity(order_id integer)
+	returns varchar
+	language plpgsql
+as $$
+declare
+	orderquantity varchar;
+begin
+	select od.quantity from public.orderdetails as od into orderquantity
+	where od.orderid=order_id;
+
+	if not found then
+		raise notice 'Order quantity for order % does not exceed 50', order_id;
+	else
+		return orderquantity;
+	end if;
+end; $$;
+
+select * from order_quantity(3)
+
+-- 5. Create a function that returns all customers that bought a certain product, only if their name starts with a, e, i, o, u. If there are none, use an if/else statement to raise a notice
+
+
+
+
+
