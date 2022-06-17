@@ -1,0 +1,115 @@
+-- Homework 1/2
+-- 1. Homework prerequisite:  create a new table called ProductHistory. 
+-- Columns should  be (id serial, oldPrice real, oldCost real, newPrice real, newCost real, changedOn date, orderedOn date, orderedQuantity int).
+
+create table ProductHistory(
+	id serial primary key not null,
+	oldPrice real,
+	oldCost real,
+	newPrice real,
+	newCost real,
+	changedOn timestamp default now(),
+	orderedOn date,
+	orderedQuantity int
+)
+
+select * from public.producthistory
+
+
+-- 2. Create a trigger  that after the  Product table gets updated,  the trigger inserts  a row in the ProductHistory.  with  the old and new price and 
+-- cost. Set the  current date to the changedOn column. Leave the other columns null.
+
+select * from public.product
+
+
+create or replace function log_product_history()
+returns trigger
+language plpgsql
+as $$
+begin
+	if(NEW.price<>OLD.price) or(NEW.cost<>OLD.cost) then
+		insert into public.producthistory(oldprice,oldcost,newprice,newcost)
+		values(OLD.price,OLD.cost,NEW.price,NEW.cost);
+	end if;
+	
+	return NEW;
+end;$$;
+
+create or replace trigger product_changes
+	after update
+	on public.product
+	for each row
+	execute procedure log_product_history();
+	
+-- 3. Create a trigger  that after the OrderDetails table gets  a record added, the trigger inserts  a row in the ProductHistory table. Set the orderedOn 
+-- column to the  current date and the orderedQuantity with the quantity  coming from the  new OrderDetails record.
+
+select * from public.orderdetails
+
+select * from public.producthistory
+
+create or replace function log_product_history_order_details()
+	returns trigger
+	language plpgsql
+as $$
+begin
+	
+		
+		insert into public.producthistory(orderedon,orderedQuantity)
+		values (now(),NEW.quantity);
+
+	return NEW;
+end; $$;
+
+create or replace trigger order_details_changes
+	after insert
+	on public.orderdetails
+	for each row
+	execute procedure log_product_history_order_details();
+	
+-- Homework 2/2
+-- 4. Create a procedure  that inserts  an order.  The procedure  takes in a business  entity  ID, an employee ID, a product  ID and the quantity.	
+-- 4.1. Insert a record in Order table. Set the orderDate to the current date. Set the totalPrice by getting the product with the given product ID,
+-- by calculating (product.price-product.cost). Set the status to 0.
+-- 4.2. Insert a record in OrderDetails table. The order ID should be the ID of the record that just got inserted. The product ID and quantity are given as 
+-- parameters. The price should come from the newly inserted row in the Order table. 
+
+select * from public.businessentity
+select * from public.employee
+select * from public.product
+select * from public.orderdetails
+
+--
+select * from public."Order"
+select * from public.product
+select * from public.orderdetails
+
+create or replace procedure insert_order(business_entity_id integer,employee_id integer,product_id integer, order_quantity integer)
+language plpgsql
+as
+$$
+declare
+	total_price real;
+	new_order_id integer;
+	new_order_price real;
+begin
+
+		select (p.price-p.cost) from public.product p into total_price
+		where id=product_id;
+
+		insert into public."Order" (orderdate,totalprice,status)
+		values(now()::date,total_price,0)
+		returning id into new_order_id;
+		
+		select o.totalprice from public."Order" o into new_order_price
+		where id=new_order_id;
+
+		insert into public.orderdetails (orderid,productid,quantity,price)
+		values(new_order_id,product_id,order_quantity,new_order_price);
+
+
+end; $$;
+
+call insert_order(1,1,2,10)
+select * from public."Order"
+select * from public.orderdetails
