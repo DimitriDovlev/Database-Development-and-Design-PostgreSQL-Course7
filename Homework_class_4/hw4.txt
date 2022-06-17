@@ -94,10 +94,9 @@ DROP FUNCTION get_employee_orders(integer)
 
 create or replace function get_employee_orders(employee_id integer)
 	returns table(
-	id integer,
 	productdetails text,
-	quantity real,
-	businessentityname date
+	quantity integer,
+	businessentityname varchar(100)
 	)
 	language plpgsql
 as
@@ -105,15 +104,15 @@ $$
 begin
 	return query
 	select
-	e.id,
-	concat(left(e.firstname,3),';',right(p.code,3),';',p.description),
-	o.totalprice,
-	o.orderdate
-	from public.employee e
-	left join public."Order" o on(o.employeeid=e.id)
-	left join public.product p on (p.price=o.totalprice)
-	where o.employeeid=employee_id
-	group by e.id,p.code,p.description,o.totalprice,o.orderdate;
+    concat(left(e.firstname,3),';',right(p.code,3),';',p.description),
+    od.quantity,
+    b."name"
+    from  public."Order" o
+    inner join  public.employee e  on(o.employeeid=e.id)
+    inner join orderdetails od on (od.orderid=o.id)
+    inner join public.product p on (p.id=od.productid)
+    inner join businessentity b on (o.businessentityid=b.id);
+
 end;
 $$;
 
@@ -129,14 +128,11 @@ select p.* from public.product p
 select b.* from public.businessentity b
 
 select
-	e.id,
-	concat(left(e.firstname,3),';',right(p.code,3),';',p.description),
-	o.totalprice,
-	o.orderdate
-	from public.employee e
-	inner join public."Order" o on(o.employeeid=e.id)
-	inner join public.product p on (p.price=o.totalprice)
-	--where o.employeeid=employee_id
-	group by e.id,p.code,p.description,o.totalprice,o.orderdate;
-
-
+    concat(left(e.firstname,3),';',right(p.code,3),';',p.description),
+    od.quantity,
+    b."name"
+    from  public."Order" o
+    inner join  public.employee e  on(o.employeeid=e.id)
+    inner join orderdetails od on (od.orderid=o.id)
+    inner join public.product p on (p.id=od.productid)
+    inner join businessentity b on (o.businessentityid=b.id);
