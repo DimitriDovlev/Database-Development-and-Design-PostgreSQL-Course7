@@ -21,9 +21,12 @@ create or replace function product_information(order_id integer)
 as $$
 begin
 	return query
-	select p.* from public.orderdetails as od
+	select p.id,p.code,p.name,p.description,p.weight,od.price,p.cost from public.orderdetails as od
 	inner join public.product as p on(od.productid=p.id)
 	where p.id=order_id;
+	--select p.* from public.orderdetails as od
+	--inner join public.product as p on(od.productid=p.id)
+	--where p.id=order_id;
 end; $$;
 
 select * from product_information (2)
@@ -123,7 +126,29 @@ select * from order_quantity(3)
 
 -- 5. Create a function that returns all customers that bought a certain product, only if their name starts with a, e, i, o, u. If there are none, use an if/else statement to raise a notice
 
+select * from public.customer
+select * from public.product
+select * from public."Order"
+select * from public.orderdetails
 
+create or replace function test_function()
+	returns varchar
+	language plpgsql
+as $$
+declare
+	customer_name record;
+begin
+	select * from public."Order" o into customer_name
+	inner join public.customer c on(c.id=o.customerid)
+	where c.name like 'a%' or c.name like 'e%' or c.name like 'i%' or c.name like 'o%' or c.name like 'u%';
+	
+	if not found then
+		raise notice 'Customers whose names start with a, e, i, o, u not found';
+	end if;
+	
+	return customer_name;
+end; $$;
 
+select * from test_function()
 
 
